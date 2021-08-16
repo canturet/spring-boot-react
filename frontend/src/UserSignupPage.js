@@ -6,7 +6,8 @@ class UserSignupPage extends React.Component {
     username: null,
     displayName: null,
     password: null,
-    passwordRepeat: null
+    passwordRepeat: null,
+    pendingApiCall: false
   };
 
   onChange = event => {
@@ -26,7 +27,14 @@ class UserSignupPage extends React.Component {
       displayName,
       password
     };
+    this.setState({pendingApiCall:true});
+
     axios.post('/api/1.0/users', body)
+      .then((response) => {
+        this.setState({pendingApiCall:false});
+      }).catch(error => {
+        this.setState({pendingApiCall:false});
+      });
   };
 
   render() {
@@ -34,25 +42,25 @@ class UserSignupPage extends React.Component {
       <div className="container">
       <form>
         <h1 className="text-center mt-5">Sign Up</h1>
-        <div className="form-group">
+        <div className="form-group ">
           <label>Username</label>
           <input className="form-control" name="username" onChange={this.onChange} />
         </div>
-        <div className="form-group">
+        <div className="form-group mt-2">
           <label>Display Name</label>
           <input className="form-control" name="displayName" onChange={this.onChange} />
         </div>
-        <div className="form-group">
+        <div className="form-group mt-2">
           <label>Password</label>
           <input className="form-control" name="password" type="password" onChange={this.onChange} />
         </div>
-        <div className="form-group">
+        <div className="form-group mt-2">
           <label>Password Repeat</label>
           <input className="form-control" name="passwordRepeat" type="password" onChange={this.onChange} />
         </div>
         <div className="text-center">
-          <button className="btn btn-primary mt-2" onClick={this.onClickSignup}>
-            Sign Up
+          <button className="btn btn-primary mt-2" onClick={this.onClickSignup} disabled={this.state.pendingApiCall}>
+          {this.state.pendingApiCall && <span className="spinner-border spinner-border-sm"></span>} Sign Up
           </button>
         </div>
       </form>
